@@ -1,38 +1,22 @@
-<div class="rpg-battle-extension-button">
-    <div id="character_status_button" class="menu_button fa-solid fa-heart"></div>
-</div>
-
-<div id="character_status_modal" class="rpg-character-status-modal">
-    <div class="rpg-modal-content">
-        <span class="rpg-close-button">&times;</span>
-        <div class="character-header">
-            <h3 id="character_name">角色名称</h3>
-            <div id="character_level">等级: 1</div>
+<!-- You might want to add additional HTML elements to ST. 
+    It's good practice to separate it out from your code -->
+<div class="example-extension-settings">
+    <div class="inline-drawer">
+        <div class="inline-drawer-toggle inline-drawer-header">
+            <b>Extension Example</b>
+            <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
         </div>
-        
-        <div class="character-stats">
-            <div class="stat-row">
-                <label>HP:</label>
-                <div class="stat-bar-container">
-                    <div id="hp_bar" class="stat-bar hp-bar"></div>
-                    <span id="hp_value">100/100</span>
-                </div>
+        <div class="inline-drawer-content">
+            <div class="example-extension_block flex-container">
+                <input id="my_button" class="menu_button" type="submit" value="Example Button" />
             </div>
-            
-            <div class="stat-row">
-                <label>MP:</label>
-                <div class="stat-bar-container">
-                    <div id="mp_bar" class="stat-bar mp-bar"></div>
-                    <span id="mp_value">50/50</span>
-                </div>
+
+            <div class="example-extension_block flex-container">
+                <input id="example_setting" type="checkbox" />
+                <label for="example_setting">This is an example</label>
             </div>
-            
-            <div class="stats-grid">
-                <div class="stat-item">力量: <span id="str_value">10</span></div>
-                <div class="stat-item">敏捷: <span id="agi_value">10</span></div>
-                <div class="stat-item">智力: <span id="int_value">10</span></div>
-                <div class="stat-item">体力: <span id="vit_value">10</span></div>
-            </div>
+
+            <hr class="sysHR" />
         </div>
     </div>
 </div>

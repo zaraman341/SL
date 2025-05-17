@@ -1,63 +1,79 @@
-// The main script for the extension
-// The following are examples of some basic extension functionality
-
-//You'll likely need to import extension_settings, getContext, and loadExtensionSettings from extensions.js
-import { extension_settings, getContext, loadExtensionSettings } from "../../../extensions.js";
-
-//You'll likely need to import some other functions from the main script
+import { extension_settings, getContext } from "../../../extensions.js";
 import { saveSettingsDebounced } from "../../../../script.js";
 
-// Keep track of where your extension is located, name should match repo name
-const extensionName = "st-extension-example";
+// 插件基本信息
+const extensionName = "rpg-battle-system";
 const extensionFolderPath = `scripts/extensions/third-party/${extensionName}`;
 const extensionSettings = extension_settings[extensionName];
-const defaultSettings = {};
+const defaultSettings = {
+    characterStats: {
+        name: "主角",
+        level: 1,
+        hp: 100,
+        maxHp: 100,
+        mp: 50,
+        maxMp: 50,
+        str: 10,
+        agi: 10,
+        int: 10,
+        vit: 10
+    }
+};
 
-
- 
-// Loads the extension settings if they exist, otherwise initializes them to the defaults.
+// 加载设置
 async function loadSettings() {
-  //Create the settings if they don't exist
-  extension_settings[extensionName] = extension_settings[extensionName] || {};
-  if (Object.keys(extension_settings[extensionName]).length === 0) {
-    Object.assign(extension_settings[extensionName], defaultSettings);
-  }
-
-  // Updating settings in the UI
-  $("#example_setting").prop("checked", extension_settings[extensionName].example_setting).trigger("input");
+    extension_settings[extensionName] = extension_settings[extensionName] || {};
+    if (Object.keys(extension_settings[extensionName]).length === 0) {
+        Object.assign(extension_settings[extensionName], defaultSettings);
+    }
+    updateCharacterDisplay();
 }
 
-// This function is called when the extension settings are changed in the UI
-function onExampleInput(event) {
-  const value = Boolean($(event.target).prop("checked"));
-  extension_settings[extensionName].example_setting = value;
-  saveSettingsDebounced();
+// 更新角色显示
+function updateCharacterDisplay() {
+    const stats = extension_settings[extensionName].characterStats;
+    
+    // 更新基本信息
+    $("#character_name").text(stats.name);
+    $("#character_level").text(`等级: ${stats.level}`);
+    
+    // 更新HP/MP
+    $("#hp_value").text(`${stats.hp}/${stats.maxHp}`);
+    $("#mp_value").text(`${stats.mp}/${stats.maxMp}`);
+    
+    // 更新HP/MP条
+    const hpPercent = (stats.hp / stats.maxHp) * 100;
+    const mpPercent = (stats.mp / stats.maxMp) * 100;
+    $("#hp_bar").css("width", `${hpPercent}%`);
+    $("#mp_bar").css("width", `${mpPercent}%`);
+    
+    // 更新属性值
+    $("#str_value").text(stats.str);
+    $("#agi_value").text(stats.agi);
+    $("#int_value").text(stats.int);
+    $("#vit_value").text(stats.vit);
 }
 
-// This function is called when the button is clicked
-function onButtonClick() {
-  // You can do whatever you want here
-  // Let's make a popup appear with the checked setting
-  toastr.info(
-    `The checkbox is ${extension_settings[extensionName].example_setting ? "checked" : "not checked"}`,
-    "A popup appeared because you clicked the button!"
-  );
+// 打开/关闭状态窗口
+function toggleCharacterStatus() {
+    $("#character_status_modal").toggleClass("visible");
+    
+    // 如果窗口打开，更新数据
+    if ($("#character_status_modal").hasClass("visible")) {
+        updateCharacterDisplay();
+    }
 }
 
-// This function is called when the extension is loaded
+// 初始化
 jQuery(async () => {
-  // This is an example of loading HTML from a file
-  const settingsHtml = await $.get(`${extensionFolderPath}/example.html`);
-
-  // Append settingsHtml to extensions_settings
-  // extension_settings and extensions_settings2 are the left and right columns of the settings menu
-  // Left should be extensions that deal with system functions and right should be visual/UI related 
-  $("#extensions_settings").append(settingsHtml);
-
-  // These are examples of listening for events
-  $("#my_button").on("click", onButtonClick);
-  $("#example_setting").on("input", onExampleInput);
-
-  // Load settings when starting things up (if you have any)
-  loadSettings();
+    // 加载HTML
+    const statusHtml = await $.get(`${extensionFolderPath}/status.html`);
+    $("body").append(statusHtml);
+    
+    // 绑定事件
+    $("#character_status_button").on("click", toggleCharacterStatus);
+    $(".rpg-close-button").on("click", toggleCharacterStatus);
+    
+    // 加载设置
+    loadSettings();
 });

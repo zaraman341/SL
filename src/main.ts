@@ -1,10 +1,12 @@
 // src/index.ts
-import { handleResponseMessage } from '@/function';
+import { handleResponseMessage, handleUserMessage } from '@/function';
 import { initCheck } from '@/variable_init';
 
 eventOn(tavern_events.GENERATION_ENDED, handleResponseMessage);
 eventOn(tavern_events.MESSAGE_SENT, initCheck);
+eventOn(tavern_events.MESSAGE_SENT, handleUserMessage); 
 eventOn(tavern_events.GENERATION_STARTED, initCheck);
+
 
 export type GameData = {
     initialized_lorebooks: string[];

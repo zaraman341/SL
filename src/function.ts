@@ -436,3 +436,46 @@ export async function handleResponseMessage() {
 
     //eventRemoveListener(tavern_events.GENERATION_ENDED, hello);
 }
+
+export async function handleUserMessage() {
+    try {
+        // 1. 获取用户刚刚发送的消息ID
+        const messageId = await getLastMessageId();
+        const messages = await getChatMessages(messageId);
+
+        if (!messages || messages.length === 0) {
+            return;
+        }
+
+        const userMessage = messages[messages.length - 1];
+
+        // 2. 确保这确实是用户的消息（虽然在MESSAGE_SENT事件中基本可以确定）
+        if (userMessage.role !== 'user') {
+            return;
+        }
+
+        // 3. 获取当前的状态数据。它存储在上一条消息中。
+        //    我们复用 getLastValidVariable 函数来安全地找到它。
+        const variables = await getLastValidVariable(messageId - 1);
+
+        if (!_.has(variables, 'stat_data')) {
+            console.log("User message handler: No stat_data found to modify.");
+            return;
+        }
+
+        // 4. 复用核心的 updateVariables 函数来解析用户消息并更新变量
+        //    注意：'variables' 对象会被直接修改 (pass by reference)
+        const wasUpdated = await updateVariables(userMessage.message, variables);
+
+        // 5. 如果变量被成功更新了...
+        if (wasUpdated) {
+            console.info("Variables updated by user message.");
+            // ...将更新后的 stateData 保存回用户自己的消息对象中。
+            // 这是至关重要的一步，AI将基于这个更新后的数据进行回复。
+            // @ts-ignore
+            await setChatMessage({ data: variables }, messageId, { refresh: "none" });
+        }
+    } catch (error) {
+        console.error("Error in handleUserMessage:", error);
+    }
+}
